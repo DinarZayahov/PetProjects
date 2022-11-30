@@ -24,7 +24,7 @@ def load_music_utils(file):
     return (X, Y, N_tones, indices_tones, chords)
 
 
-def generate_music(inference_model, indices_tones, chords, diversity = 0.5):
+def generate_music(inference_model, indices_tones, chords, num_of_values, diversity = 0.5):
     """
     Generates music using a model trained to learn musical patterns of a jazz soloist. Creates an audio stream
     to save the music and play it.
@@ -59,7 +59,7 @@ def generate_music(inference_model, indices_tones, chords, diversity = 0.5):
             curr_chords.insert((j.offset % 4), j)
         
         # Generate a sequence of tones using the model
-        _, indices = predict_and_sample(inference_model)
+        _, indices = predict_and_sample(inference_model, num_of_values)
         indices = list(indices.squeeze())
         pred = [indices_tones[p] for p in indices]
         
@@ -113,7 +113,7 @@ def generate_music(inference_model, indices_tones, chords, diversity = 0.5):
     return out_stream
 
 
-def predict_and_sample(inference_model, x_initializer = x_initializer, a_initializer = a_initializer, 
+def predict_and_sample(inference_model, num_of_values, x_initializer = x_initializer, a_initializer = a_initializer, 
                        c_initializer = c_initializer):
     """
     Predicts the next value of values using the inference model.
@@ -132,7 +132,7 @@ def predict_and_sample(inference_model, x_initializer = x_initializer, a_initial
     
     ### START CODE HERE ###
     import torch
-    pred = inference_model(torch.zeros(60, 30, 78), 50)
+    pred = inference_model(torch.zeros(60, 30, 78), num_of_values)
     indices = torch.argmax(pred, axis=-1).numpy()
     results = to_categorical(indices, num_classes=78)
     ### END CODE HERE ###
